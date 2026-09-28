@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quads Lắng Nghe – Tra cứu trạng thái góp ý</title>
+<meta name="description" content="Nhập mã theo dõi để xem góp ý ẩn danh của bạn đã được Ban lãnh đạo Quads xử lý đến đâu.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b0a09">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quads Lắng Nghe – Tra cứu trạng thái góp ý">
+<meta property="og:description" content="Nhập mã theo dõi để xem góp ý ẩn danh của bạn đã được Ban lãnh đạo xử lý đến đâu.">
+<meta property="og:image" content="https://vdt1011.github.io/quads-lang-nghe/assets/banner.jpg">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0a09;
+    --panel: #151311;
+    --panel-2: #1c1916;
+    --line: #2c2722;
+    --text: #efe7da;
+    --muted: #a79b8a;
+    --gold: #d9b67a;
+    --gold-2: #b78e54;
+    --s-wait: #a59f97;   --s-wait-bg: rgba(165, 159, 151, .14);
+    --s-recv: #e0b86a;   --s-recv-bg: rgba(224, 184, 106, .14);
+    --s-done: #5fc48a;   --s-done-bg: rgba(95, 196, 138, .14);
+    --s-rej:  #ef7a74;   --s-rej-bg:  rgba(239, 122, 116, .14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(ellipse 70% 40% at 50% 0%, rgba(183, 142, 84, .14), transparent 70%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 56px; }
+
+  header { text-align: center; margin-bottom: 26px; }
+  .banner {
+    display: block; width: 100%; aspect-ratio: 4 / 1; object-fit: cover; object-position: 50% 45%;
+    border-radius: 16px; border: 1px solid var(--line); background: #000;
+  }
+  h1 {
+    margin: 22px 0 8px;
+    font-size: clamp(22px, 4vw, 30px);
+    font-weight: 700;
+    letter-spacing: .01em;
+    background: linear-gradient(90deg, var(--gold-2), #f7d19a 50%, var(--gold-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 0 auto; max-width: 620px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .search { display: flex; gap: 10px; }
+  .search input {
+    flex: 1; min-width: 0;
+    background: #0e0d0c; color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 13px 14px; font: inherit; font-size: 16px;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .search input::placeholder { text-transform: none; letter-spacing: 0; color: #6f665b; }
+  .search input:focus { outline: none; border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(183, 142, 84, .2); }
+  .btn {
+    border: 0; border-radius: 10px; padding: 0 20px; font: inherit; font-weight: 600; cursor: pointer;
+    color: #1a140c; background: linear-gradient(180deg, #f1d39f, var(--gold-2));
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:focus-visible, .stat:focus-visible, .link-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .hint { margin: 10px 2px 0; font-size: 13px; color: var(--muted); }
+
+  .result { margin-top: 16px; display: none; }
+  .result.show { display: block; }
+  .res-item { border-top: 1px solid var(--line); padding: 16px 2px 4px; }
+  .res-item:first-child { border-top: 0; }
+  .res-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .res-code { font-size: 20px; font-weight: 700; letter-spacing: .06em; word-break: break-word; }
+  .res-meta { margin-top: 6px; font-size: 13px; color: var(--muted); }
+  .res-note {
+    margin-top: 12px; padding: 12px 14px; border-radius: 10px; font-size: 14px; line-height: 1.6;
+    background: rgba(255, 255, 255, .03); border-left: 3px solid var(--gold-2);
+    white-space: pre-wrap;
+  }
+  .res-note b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .res-item.rej .res-note { border-left-color: var(--s-rej); }
+  .res-item.done .res-note { border-left-color: var(--s-done); }
+  .empty { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 4px 0 0; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap;
+  }
+  .badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .b-wait { color: var(--s-wait); background: var(--s-wait-bg); }
+  .b-recv { color: var(--s-recv); background: var(--s-recv-bg); }
+  .b-done { color: var(--s-done); background: var(--s-done-bg); }
+  .b-rej  { color: var(--s-rej);  background: var(--s-rej-bg); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 22px 0; }
+  .stat {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+    cursor: pointer; text-align: left; font: inherit; color: inherit;
+  }
+  .stat:hover { border-color: #3d352d; }
+  .stat[aria-pressed="true"] { border-color: var(--gold-2); box-shadow: inset 0 0 0 1px var(--gold-2); }
+  .stat .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .l { margin-top: 2px; font-size: 13px; color: var(--muted); }
+  .stat.s-wait .n { color: var(--s-wait); }
+  .stat.s-recv .n { color: var(--s-recv); }
+  .stat.s-done .n { color: var(--s-done); }
+  .stat.s-rej  .n { color: var(--s-rej); }
+
+  .board-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .board-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+  .board-meta { font-size: 12px; color: var(--muted); }
+  .link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--gold); cursor: pointer; text-decoration: underline; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 10px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  td.code { font-weight: 600; letter-spacing: .05em; word-break: break-word; }
+  td.note { color: var(--muted); line-height: 1.5; white-space: pre-wrap; }
+  td.date { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .legend { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 20px; margin-top: 22px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .legend .badge { margin-bottom: 4px; }
+  footer { margin-top: 28px; text-align: center; font-size: 13px; color: var(--muted); line-height: 1.7; }
+  footer a { color: var(--gold); }
+  .loading { color: var(--muted); padding: 18px 0; text-align: center; }
+
+  @media (max-width: 640px) {
+    .banner { aspect-ratio: 16 / 7; border-radius: 12px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .legend { grid-template-columns: 1fr; }
+    thead { display: none; }
+    table, tbody, tr, td { display: block; width: 100%; }
+    tr { padding: 12px 0; border-bottom: 1px solid var(--line); }
+    tr:last-child { border-bottom: 0; }
+    td { border: 0; padding: 3px 0; }
+    td.note:empty { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="banner" src="assets/banner.jpg" alt="Quads Hanoi Poker Club">
+    <h1>Tra cứu trạng thái góp ý</h1>
+    <p>Nhập mã theo dõi bạn đã tự đặt khi gửi góp ý để xem Ban lãnh đạo đã xử lý đến đâu. Trang chỉ hiển thị mã, trạng thái và lý do, không bao giờ hiển thị nội dung góp ý.</p>
+  </header>
+
+  <section class="card">
+    <form class="search" id="searchForm" autocomplete="off">
+      <input id="q" type="text" placeholder="Nhập mã của bạn, ví dụ: CAFE-SUA-27" aria-label="Mã theo dõi">
+      <button class="btn" type="submit">Tra cứu</button>
+    </form>
+    <p class="hint">Không phân biệt chữ hoa, chữ thường, dấu cách hay dấu gạch.</p>
+    <div class="result" id="result" aria-live="polite"></div>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="card">
+    <div class="board-head">
+      <h2 id="boardTitle">Tất cả mã đã gửi</h2>
+      <span class="board-meta"><span id="updated"></span> · <button class="link-btn" id="reload" type="button">Tải lại</button></span>
+    </div>
+    <div id="board"><div class="loading">Đang tải dữ liệu…</div></div>
+  </section>
+
+  <div class="legend">
+    <div><span class="badge b-wait">Chưa tiếp nhận</span><br>Góp ý đã vào hệ thống, Ban lãnh đạo chưa xem xét.</div>
+    <div><span class="badge b-recv">Đã tiếp nhận</span><br>Ban lãnh đạo đã đọc và đang xem xét, xử lý.</div>
+    <div><span class="badge b-done">Đã giải quyết</span><br>Vấn đề đã được xử lý, có thể kèm phản hồi.</div>
+    <div><span class="badge b-rej">Không tiếp nhận</span><br>Góp ý không được tiếp nhận, luôn kèm lý do.</div>
+  </div>
+
+  <footer>
+    Chưa gửi góp ý? <a href="https://forms.gle/uvyjx1a3smVC96w89">Gửi góp ý ẩn danh tại đây</a><br>
+    Trạng thái mới có thể mất vài phút để hiển thị trên trang.<br>
+    Quads Lắng Nghe · Mọi góp ý được gửi trực tiếp đến anh Quang và anh Phạm Anh
+  </footer>
+</div>
+
+<script>
+  // Tab "Công khai" của Google Sheet, chỉ chứa 4 cột: Mã, Trạng thái, Lý do / Phản hồi, Ngày gửi
+  const CSV_URL = 'CSV_URL_HERE';
+
+  const STATUS = {
+    'Chưa tiếp nhận': 'wait',
+    'Đã tiếp nhận': 'recv',
+    'Đã giải quyết': 'done',
+    'Không tiếp nhận': 'rej',
+  };
+  const DEFAULT_STATUS = 'Chưa tiếp nhận';
+  let DATA = [];
+  let filter = null;
+
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const badge = (s) => el('span', 'badge b-' + (STATUS[s] || 'wait'), s);
+  // So khớp dễ tính: bỏ dấu, khoảng trắng, gạch; không phân biệt hoa thường
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[đĐ]/g, 'd').toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false;
+        } else field += c;
+      } else if (c === '"') quoted = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else field += c;
+    }
+    if (field !== '' || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  async function load() {
+    $('board').replaceChildren(el('div', 'loading', 'Đang tải dữ liệu…'));
+    try {
+      const res = await fetch(CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      DATA = parseCSV(await res.text())
+        .slice(1)
+        .map((r) => ({
+          code: (r[0] || '').trim(),
+          status: (r[1] || '').trim(),
+          note: (r[2] || '').trim(),
+          date: (r[3] || '').trim(),
+        }))
+        .filter((d) => d.code && !d.code.startsWith('#'))
+        .map((d) => ({ ...d, code: d.code.toUpperCase(), status: STATUS[d.status] ? d.status : DEFAULT_STATUS }))
+        .reverse();
+      const now = new Date();
+      $('updated').textContent = 'Cập nhật lúc ' + now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+      renderStats();
+      renderBoard();
+      const q = new URLSearchParams(location.search).get('ma');
+      if (q && !$('q').value) { $('q').value = q; lookup(q); }
+      else if ($('q').value && $('result').classList.contains('show')) lookup($('q').value);
+    } catch (err) {
+      $('updated').textContent = '';
+      $('board').replaceChildren(el('div', 'loading', 'Không tải được dữ liệu, vui lòng thử lại sau ít phút.'));
+    }
+  }
+
+  function renderStats() {
+    const box = $('stats');
+    box.replaceChildren();
+    Object.keys(STATUS).forEach((s) => {
+      const b = el('button', 'stat s-' + STATUS[s]);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(filter === s));
+      b.append(el('div', 'n', DATA.filter((d) => d.status === s).length), el('div', 'l', s));
+      b.onclick = () => { filter = filter === s ? null : s; renderStats(); renderBoard(); };
+      box.append(b);
+    });
+  }
+
+  function renderBoard() {
+    const rows = filter ? DATA.filter((d) => d.status === filter) : DATA;
+    $('boardTitle').textContent = filter ? 'Mã ở trạng thái “' + filter + '”' : 'Tất cả mã đã gửi';
+    const box = $('board');
+    box.replaceChildren();
+    if (!rows.length) { box.append(el('div', 'loading', filter ? 'Không có mã nào ở trạng thái này.' : 'Chưa có mã nào.')); return; }
+    const t = el('table');
+    const head = el('thead');
+    const hr = el('tr');
+    ['Mã', 'Trạng thái', 'Lý do / Phản hồi', 'Ngày gửi'].forEach((h) => hr.append(el('th', null, h)));
+    head.append(hr);
+    t.append(head);
+    const body = el('tbody');
+    rows.forEach((d) => {
+      const tr = el('tr');
+      const st = el('td');
+      st.append(badge(d.status));
+      tr.append(el('td', 'code', d.code), st, el('td', 'note', d.note), el('td', 'date', d.date));
+      body.append(tr);
+    });
+    t.append(body);
+    box.append(t);
+  }
+
+  function lookup(q) {
+    const key = norm(q);
+    const box = $('result');
+    box.replaceChildren();
+    box.classList.add('show');
+    if (!key) { box.append(el('p', 'empty', 'Vui lòng nhập mã theo dõi.')); return; }
+    const found = DATA.filter((d) => norm(d.code) === key);
+    if (!found.length) {
+      box.append(el('p', 'empty', 'Chưa tìm thấy mã “' + q.trim().toUpperCase() + '”. Hãy kiểm tra lại mã. Góp ý mới gửi có thể mất vài phút để xuất hiện. Nếu lúc gửi bạn để trống ô mã theo dõi thì không tra cứu được.'));
+      return;
+    }
+    found.forEach((d) => {
+      const item = el('div', 'res-item ' + (STATUS[d.status] || ''));
+      const head = el('div', 'res-head');
+      head.append(el('span', 'res-code', d.code), badge(d.status));
+      item.append(head, el('div', 'res-meta', d.date ? 'Gửi ngày ' + d.date : ''));
+      if (d.note) {
+        const n = el('div', 'res-note');
+        n.append(el('b', null, d.status === 'Không tiếp nhận' ? 'Lý do' : 'Phản hồi từ Ban lãnh đạo'), document.createTextNode(d.note));
+        item.append(n);
+      }
+      box.append(item);
+    });
+  }
+
+  $('searchForm').addEventListener('submit', (e) => { e.preventDefault(); lookup($('q').value); });
+  $('reload').addEventListener('click', load);
+
+  load();
+</script>
+</body>
+</html>
