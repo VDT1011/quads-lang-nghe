@@ -131,6 +131,7 @@
   td { padding: 12px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
   td.code { font-weight: 600; letter-spacing: .05em; word-break: break-word; }
+  td.code.none { font-weight: 400; font-style: italic; letter-spacing: 0; color: var(--muted); }
   td.note { color: var(--muted); line-height: 1.5; white-space: pre-wrap; }
   td.date { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
@@ -174,7 +175,7 @@
 
   <section class="card">
     <div class="board-head">
-      <h2 id="boardTitle">Tất cả mã đã gửi</h2>
+      <h2 id="boardTitle">Tất cả góp ý đã gửi</h2>
       <span class="board-meta"><span id="updated"></span> · <button class="link-btn" id="reload" type="button">Tải lại</button></span>
     </div>
     <div id="board"><div class="loading">Đang tải dữ liệu…</div></div>
@@ -205,6 +206,7 @@
     'Không tiếp nhận': 'rej',
   };
   const DEFAULT_STATUS = 'Chưa tiếp nhận';
+  const NO_CODE = 'Không có mã';
   let DATA = [];
   let filter = null;
 
@@ -248,7 +250,8 @@
           note: (r[2] || '').trim(),
           date: (r[3] || '').trim(),
         }))
-        .filter((d) => d.code && !d.code.startsWith('#'))
+        // Giữ cả góp ý không có mã; chỉ bỏ dòng trống và giá trị lỗi của Sheet (#N/A…)
+        .filter((d) => (d.code || d.status || d.note || d.date) && !d.code.startsWith('#'))
         .map((d) => ({ ...d, code: d.code.toUpperCase(), status: STATUS[d.status] ? d.status : DEFAULT_STATUS }))
         .reverse();
       const now = new Date();
@@ -279,10 +282,10 @@
 
   function renderBoard() {
     const rows = filter ? DATA.filter((d) => d.status === filter) : DATA;
-    $('boardTitle').textContent = filter ? 'Mã ở trạng thái “' + filter + '”' : 'Tất cả mã đã gửi';
+    $('boardTitle').textContent = filter ? 'Góp ý ở trạng thái “' + filter + '”' : 'Tất cả góp ý đã gửi';
     const box = $('board');
     box.replaceChildren();
-    if (!rows.length) { box.append(el('div', 'loading', filter ? 'Không có mã nào ở trạng thái này.' : 'Chưa có mã nào.')); return; }
+    if (!rows.length) { box.append(el('div', 'loading', filter ? 'Không có góp ý nào ở trạng thái này.' : 'Chưa có góp ý nào.')); return; }
     const t = el('table');
     const head = el('thead');
     const hr = el('tr');
@@ -294,7 +297,7 @@
       const tr = el('tr');
       const st = el('td');
       st.append(badge(d.status));
-      tr.append(el('td', 'code', d.code), st, el('td', 'note', d.note), el('td', 'date', d.date));
+      tr.append(el('td', d.code ? 'code' : 'code none', d.code || NO_CODE), st, el('td', 'note', d.note), el('td', 'date', d.date));
       body.append(tr);
     });
     t.append(body);
@@ -309,7 +312,7 @@
     if (!key) { box.append(el('p', 'empty', 'Vui lòng nhập mã theo dõi.')); return; }
     const found = DATA.filter((d) => norm(d.code) === key);
     if (!found.length) {
-      box.append(el('p', 'empty', 'Chưa tìm thấy mã “' + q.trim().toUpperCase() + '”. Hãy kiểm tra lại mã. Góp ý mới gửi có thể mất vài phút để xuất hiện. Nếu lúc gửi bạn để trống ô mã theo dõi thì không tra cứu được.'));
+      box.append(el('p', 'empty', 'Chưa tìm thấy mã “' + q.trim().toUpperCase() + '”. Hãy kiểm tra lại mã. Góp ý mới gửi có thể mất vài phút để xuất hiện. Nếu lúc gửi bạn để trống ô mã theo dõi thì không tra cứu được, góp ý đó vẫn hiện trong bảng bên dưới với nhãn “' + NO_CODE + '”.'));
       return;
     }
     found.forEach((d) => {

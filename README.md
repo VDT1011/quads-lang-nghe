@@ -26,7 +26,8 @@ Trang **không bao giờ** nhận được nội dung góp ý: chỉ tab "Công 
    nên không nhắc chi tiết có thể lộ danh tính người gửi.
 3. Trang tự cập nhật sau vài phút (Google làm mới bản công bố khoảng 5 phút/lần).
 
-Góp ý không điền mã theo dõi sẽ không xuất hiện trên trang.
+Góp ý không điền mã theo dõi vẫn hiện trong bảng với nhãn *Không có mã* nhưng không tra cứu riêng được.
+Vì vậy, điều kiện của công thức FILTER ở tab "Công khai" phải là cột A (Dấu thời gian) khác rỗng, không dùng cột mã.
 
 ## Sửa trang
 
