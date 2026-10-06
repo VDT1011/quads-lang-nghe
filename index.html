@@ -31,6 +31,7 @@
     --s-rej:  #ef7a74;   --s-rej-bg:  rgba(239, 122, 116, .14);
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
     font-family: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
@@ -63,30 +64,62 @@
     border-radius: 16px;
     padding: 20px;
   }
+  .card + .card { margin-top: 16px; }
   .search { display: flex; gap: 10px; }
-  .search input {
+  .search input, .field {
     flex: 1; min-width: 0;
     background: #0e0d0c; color: var(--text);
     border: 1px solid var(--line); border-radius: 10px;
     padding: 13px 14px; font: inherit; font-size: 16px;
     text-transform: uppercase; letter-spacing: .06em;
   }
-  .search input::placeholder { text-transform: none; letter-spacing: 0; color: #6f665b; }
-  .search input:focus { outline: none; border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(183, 142, 84, .2); }
+  .search input::placeholder, .field::placeholder { text-transform: none; letter-spacing: 0; color: #6f665b; }
+  .search input:focus, .field:focus { outline: none; border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(183, 142, 84, .2); }
+  .field { display: block; width: 100%; }
   .btn {
     border: 0; border-radius: 10px; padding: 0 20px; font: inherit; font-weight: 600; cursor: pointer;
     color: #1a140c; background: linear-gradient(180deg, #f1d39f, var(--gold-2));
   }
   .btn:hover { filter: brightness(1.06); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .cta-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
   .btn-cta {
-    display: inline-flex; align-items: center; gap: 9px; margin-top: 20px;
+    display: inline-flex; align-items: center; gap: 9px;
     padding: 13px 26px; border-radius: 999px; font-size: 16px; text-decoration: none;
     box-shadow: 0 10px 28px -12px rgba(217, 182, 122, .6);
   }
   .btn-cta svg { width: 18px; height: 18px; flex: none; }
+  .btn-ghost { color: var(--gold); background: transparent; box-shadow: inset 0 0 0 1px var(--gold-2); }
+  .btn-ghost:hover { background: rgba(183, 142, 84, .1); }
   .card-title { display: block; margin: 0 0 12px; font-size: 16px; font-weight: 600; }
-  .btn:focus-visible, .stat:focus-visible, .link-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .btn:focus-visible, .stat:focus-visible, .link-btn:focus-visible, .thumb-x:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .hint { margin: 10px 2px 0; font-size: 13px; color: var(--muted); }
+
+  #upload { scroll-margin-top: 16px; }
+  .up-intro { margin: -4px 2px 14px; line-height: 1.6; }
+  .drop {
+    position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    margin-top: 10px; padding: 18px 14px; border: 1px dashed #4a4037; border-radius: 12px;
+    color: var(--muted); font-size: 14px; text-align: center; cursor: pointer;
+  }
+  .drop:hover, .drop.over { border-color: var(--gold-2); color: var(--text); background: rgba(183, 142, 84, .06); }
+  .drop:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .drop input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .drop svg { width: 26px; height: 26px; color: var(--gold); }
+  .drop small { font-size: 12px; color: #7d7265; }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .thumbs:empty { display: none; }
+  .thumb { position: relative; width: 72px; height: 72px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+  .thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .thumb-x {
+    position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; padding: 0;
+    border: 0; border-radius: 50%; background: rgba(0, 0, 0, .7); color: #fff; font-size: 15px; line-height: 22px; cursor: pointer;
+  }
+  .up-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .up-btn { padding: 12px 22px; }
+  .up-msg { margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .up-msg.ok { color: var(--s-done); }
+  .up-msg.err { color: var(--s-rej); }
 
   .result { margin-top: 16px; display: none; }
   .result.show { display: block; }
@@ -150,6 +183,7 @@
 
   @media (max-width: 640px) {
     .banner { aspect-ratio: 16 / 7; border-radius: 12px; }
+    .cta-row { flex-direction: column; }
     .btn-cta { display: flex; justify-content: center; }
     .stats { grid-template-columns: repeat(2, 1fr); }
     .legend { grid-template-columns: 1fr; }
@@ -168,10 +202,16 @@
     <img class="banner" src="assets/banner.jpg" alt="Quads Hanoi Poker Club">
     <h1>Tra cứu trạng thái góp ý</h1>
     <p>Gửi góp ý ẩn danh đến Ban lãnh đạo Quads, sau đó dùng mã theo dõi bạn tự đặt để xem góp ý đã được xử lý đến đâu. Trang chỉ hiển thị mã, trạng thái và lý do, không bao giờ hiển thị nội dung góp ý.</p>
-    <a class="btn btn-cta" href="https://forms.gle/uvyjx1a3smVC96w89" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      Gửi góp ý ẩn danh
-    </a>
+    <div class="cta-row">
+      <a class="btn btn-cta" href="https://forms.gle/uvyjx1a3smVC96w89" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        Gửi góp ý ẩn danh
+      </a>
+      <a class="btn btn-cta btn-ghost" href="#upload" id="upShortcut" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg>
+        Gửi ảnh kèm góp ý
+      </a>
+    </div>
   </header>
 
   <section class="card">
@@ -182,6 +222,25 @@
     </form>
     <p class="hint">Không phân biệt chữ hoa, chữ thường, dấu cách hay dấu gạch.</p>
     <div class="result" id="result" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="upload" hidden>
+    <label class="card-title" for="upCode">Gửi ảnh kèm góp ý</label>
+    <p class="hint up-intro">Có ảnh minh hoạ? Nhập mã theo dõi của góp ý rồi chọn ảnh. Ảnh chỉ gửi tới Ban lãnh đạo, không hiển thị trên trang. Thông tin vị trí và thiết bị trong ảnh được xoá ngay trên máy bạn trước khi gửi.</p>
+    <form id="upForm" autocomplete="off">
+      <input class="field" id="upCode" type="text" placeholder="Mã theo dõi của góp ý, ví dụ: CAFE-SUA-27">
+      <label class="drop" id="upDrop">
+        <input id="upFiles" type="file" accept="image/*" multiple>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+        <span>Chọn ảnh hoặc kéo thả vào đây</span>
+        <small>Tối đa 5 ảnh mỗi lần · Tránh ảnh có thể làm lộ danh tính của bạn</small>
+      </label>
+      <div class="thumbs" id="upThumbs"></div>
+      <div class="up-actions">
+        <button class="btn up-btn" id="upBtn" type="submit" disabled>Gửi ảnh</button>
+        <p class="up-msg" id="upMsg" aria-live="polite"></p>
+      </div>
+    </form>
   </section>
 
   <div class="stats" id="stats"></div>
@@ -211,6 +270,10 @@
 <script>
   // Tab "Công khai" của Google Sheet, chỉ chứa 4 cột: Mã, Trạng thái, Lý do / Phản hồi, Ngày gửi
   const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTM19jYjmhKlSvfD3D-hV4KM3zhI0Es2IuJ_iZuIEds4H9nmbDRvsKL4cWeLaT6jL9nxczpNHcwyKs6/pub?gid=1202890909&single=true&output=csv';
+  // Web App Apps Script nhận ảnh đính kèm (URL /exec). Để trống thì ẩn phần gửi ảnh.
+  const UPLOAD_URL = 'https://script.google.com/macros/s/AKfycbwXAYB2XkpMuYvFpQ58gyT_7KNZ6gtODCBiS4DVRN5xh6usjjHi4dPvFhinU7w1Una2/exec';
+  const UP_MAX_FILES = 5;
+  const UP_MAX_SIDE = 1600;
 
   const STATUS = {
     'Chưa tiếp nhận': 'wait',
@@ -222,6 +285,8 @@
   const NO_CODE = 'Không có mã';
   let DATA = [];
   let filter = null;
+  let upList = [];
+  let sending = false;
 
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -328,6 +393,7 @@
       box.append(el('p', 'empty', 'Chưa tìm thấy mã “' + q.trim().toUpperCase() + '”. Hãy kiểm tra lại mã. Góp ý mới gửi có thể mất vài phút để xuất hiện. Nếu lúc gửi bạn để trống ô mã theo dõi thì không tra cứu được, góp ý đó vẫn hiện trong bảng bên dưới với nhãn “' + NO_CODE + '”.'));
       return;
     }
+    if (UPLOAD_URL && !$('upCode').value) { $('upCode').value = found[0].code; refreshUpload(); }
     found.forEach((d) => {
       const item = el('div', 'res-item ' + (STATUS[d.status] || ''));
       const head = el('div', 'res-head');
@@ -342,9 +408,120 @@
     });
   }
 
+  function initUpload() {
+    if (!UPLOAD_URL) return;
+    $('upload').hidden = false;
+    $('upShortcut').hidden = false;
+    $('upShortcut').addEventListener('click', () => setTimeout(() => $('upCode').focus({ preventScroll: true }), 400));
+    $('upFiles').addEventListener('change', (e) => { addImages(e.target.files); e.target.value = ''; });
+    const drop = $('upDrop');
+    ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('over')));
+    drop.addEventListener('drop', (e) => { e.preventDefault(); addImages(e.dataTransfer.files); });
+    $('upCode').addEventListener('input', refreshUpload);
+    $('upForm').addEventListener('submit', (e) => { e.preventDefault(); sendImages(); });
+  }
+
+  function addImages(files) {
+    showUpMsg('');
+    for (const file of files) {
+      if (!file.type.startsWith('image/') && !/\.(heic|heif)$/i.test(file.name)) continue;
+      if (upList.length >= UP_MAX_FILES) { showUpMsg('Mỗi lần gửi tối đa ' + UP_MAX_FILES + ' ảnh.', 'err'); break; }
+      upList.push({ file, url: URL.createObjectURL(file) });
+    }
+    renderThumbs();
+  }
+
+  function renderThumbs() {
+    const box = $('upThumbs');
+    box.replaceChildren();
+    upList.forEach((it, i) => {
+      const t = el('div', 'thumb');
+      const img = el('img');
+      img.src = it.url;
+      img.alt = '';
+      const x = el('button', 'thumb-x', '×');
+      x.type = 'button';
+      x.setAttribute('aria-label', 'Bỏ ảnh này');
+      x.onclick = () => { URL.revokeObjectURL(it.url); upList.splice(i, 1); renderThumbs(); };
+      t.append(img, x);
+      box.append(t);
+    });
+    refreshUpload();
+  }
+
+  function refreshUpload() {
+    $('upBtn').disabled = sending || !upList.length || !norm($('upCode').value);
+  }
+
+  function showUpMsg(text, kind) {
+    $('upMsg').textContent = text;
+    $('upMsg').className = 'up-msg' + (kind ? ' ' + kind : '');
+  }
+
+  // Vẽ lại ảnh qua canvas: thu nhỏ, nén JPEG và bỏ toàn bộ EXIF (vị trí GPS, tên máy…)
+  async function toJpeg(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      // Dùng onload thay vì img.decode(): decode() không xong khi tab bị ẩn (người dùng chuyển app)
+      const img = await new Promise((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = url;
+      });
+      const k = Math.min(1, UP_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * k);
+      c.height = Math.round(img.naturalHeight * k);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const data = c.toDataURL('image/jpeg', 0.82);
+      return data.slice(data.indexOf(',') + 1);
+    } catch (err) {
+      throw new Error('Không đọc được ảnh “' + file.name + '”. Hãy chọn ảnh JPG hoặc PNG.');
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function sendImages() {
+    const code = $('upCode').value.trim();
+    if (sending || !norm(code) || !upList.length) return;
+    sending = true;
+    refreshUpload();
+    let sent = 0;
+    try {
+      for (const it of upList) {
+        showUpMsg('Đang gửi ảnh ' + (sent + 1) + '/' + upList.length + '…');
+        const image = await toJpeg(it.file);
+        let out;
+        try {
+          // Gửi dạng text/plain để trình duyệt không hỏi trước (preflight); Apps Script không trả lời được bước đó
+          const res = await fetch(UPLOAD_URL, { method: 'POST', body: JSON.stringify({ code, image }) });
+          out = await res.json();
+        } catch (err) {
+          throw new Error('Không kết nối được tới máy chủ nhận ảnh, vui lòng thử lại.');
+        }
+        if (!out.ok) throw new Error(out.error || 'Gửi ảnh không thành công, vui lòng thử lại.');
+        sent++;
+      }
+      showUpMsg('Đã gửi ' + sent + ' ảnh cho mã “' + code.toUpperCase() + '”. Cảm ơn bạn!', 'ok');
+    } catch (err) {
+      showUpMsg((sent ? 'Đã gửi ' + sent + ' ảnh. ' : '') + err.message, 'err');
+    }
+    // Bỏ các ảnh đã gửi xong; ảnh lỗi ở lại để bấm gửi lại
+    upList.splice(0, sent).forEach((it) => URL.revokeObjectURL(it.url));
+    sending = false;
+    renderThumbs();
+  }
+
   $('searchForm').addEventListener('submit', (e) => { e.preventDefault(); lookup($('q').value); });
   $('reload').addEventListener('click', load);
 
+  initUpload();
   load();
 </script>
 </body>

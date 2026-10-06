@@ -29,6 +29,17 @@ Trang **không bao giờ** nhận được nội dung góp ý: chỉ tab "Công 
 Góp ý không điền mã theo dõi vẫn hiện trong bảng với nhãn *Không có mã* nhưng không tra cứu riêng được.
 Vì vậy, điều kiện của công thức FILTER ở tab "Công khai" phải là cột A (Dấu thời gian) khác rỗng, không dùng cột mã.
 
+## Ảnh đính kèm
+
+Người gửi có thể gửi thêm ảnh cho góp ý của mình ở khung *Gửi ảnh kèm góp ý*, kèm mã theo dõi.
+Ảnh được thu nhỏ, nén JPEG và xoá EXIF (vị trí, thiết bị) ngay trên trình duyệt, rồi gửi tới một
+Web App Apps Script. Địa chỉ Web App nằm ở hằng `UPLOAD_URL` trong `index.html`; để trống thì khung này ẩn đi.
+
+- Ảnh lưu trong thư mục Drive riêng tư *Quads Lắng Nghe – Ảnh đính kèm* của người triển khai Web App.
+- Mỗi ảnh ghi một dòng vào tab *Ảnh đính kèm* của Sheet câu trả lời (thời gian, mã, link ảnh). Tab này không được công bố.
+- Chỉ nhận ảnh cho mã đã có trong Sheet: tối đa 5 ảnh mỗi lần, 20 ảnh mỗi mã, 300 ảnh mỗi ngày.
+- Mã nguồn Web App không nằm trong repo này vì có chứa ID của Sheet.
+
 ## Sửa trang
 
 Toàn bộ trang nằm trong `index.html`. Link CSV ở hằng `CSV_URL`. Đẩy lên nhánh `main` là GitHub Pages tự cập nhật.
